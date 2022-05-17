@@ -1,0 +1,16 @@
+
+
+<div key={list.id} className="card">
+<h3 className="card--title">{list.name}</h3>;
+{
+  list.abilities.map(skill => {
+    return (
+      <div key={i++} className="card-skill">
+        <ul className="card-skill--list">
+          <li className="card-skill--name">{skill.ability.name}</li>
+        </ul>
+      </div>
+    );
+  });
+}        
+</div>
