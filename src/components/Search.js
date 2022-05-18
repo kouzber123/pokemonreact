@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 function Search() {
   var i = 0;
+  var test = [];
+  var namess = [];
+  const [turn, setTurn] = useState(Boolean);
   const [search, setSearch] = useState("");
   const [isSearchOn, setIsSearchOn] = useState(false);
   const [list, setList] = useState([{}]);
-  const [synopsis, setSynopsis] = useState([]);
   async function handleSubmit(e) {
     const url = `https://pokeapi.co/api/v2/pokemon/${search}`;
     e.preventDefault();
@@ -14,7 +16,7 @@ function Search() {
         if (response) {
           setIsSearchOn(true);
           const data = response.data;
-          getSkillSynopsis(data.abilities);
+          getSkillSynopsis(data, data.abilities);
         }
       });
     } catch (error) {
@@ -22,37 +24,64 @@ function Search() {
     }
   }
   //this will seperate synopsis data into array
-  function getSkillSynopsis(data) {
-    console.log(data);
-    const text = data;
+  function getSkillSynopsis(datas, abilitydata) {
+    const text = abilitydata;
     var names = text.map(skills => {
       return skills.ability.name;
     });
+    namess.push(names);
+    console.log(namess);
+
     var urls = text.map(skills => {
       return skills.ability.url;
     });
-    // console.log(urls);
-    // console.log(names);
-
-    return axios.all(
-      urls.map(url => {
+    // console.log(datas);
+    axios.all(
+      urls.map(async url => {
         const d = url;
-        return axios.get(d).then(response => {
-          // console.log(response.data);
-          var res = response.data.flavor_text_entries[0].flavor_text;
-          console.log(res);
+        return await axios.get(d).then(response => {
+          if (response) {
+            var res = response.data.flavor_text_entries[0].flavor_text;
+            test.push(res);
+            console.log(test);
+          }
+
+          // console.log(names);
+
+          if (setIsSearchOn) {
+            console.log("here aim");
+            var j = -1;
+            var run = names.map(skill => {
+              j++;
+              return skill + " " + test[j];
+            });
+            console.log(run);
+            setList([
+              {
+                id: datas.id,
+                name: datas.name,
+                abilities: run,
+                spriteFront: datas.sprites.front_default,
+                spriteBack: datas.sprites.back_default
+              }
+            ]);
+          }
         });
       })
     );
-
-    //     setSynopsis(res);
-    //     setList({
-    //       synopsis: [...synopsis, synopsis]
-    //     });
-    //   );
-
-    // console.log(list);
   }
+  useEffect(() => {
+    console.log(list);
+  }, [list]);
+
+  function turnImage() {
+    if (turn === true) {
+      setTurn(false);
+    } else {
+      setTurn(true);
+    }
+  }
+  //refactor card into own seperate component
   return (
     <div className="Search">
       <input onChange={e => setSearch(e.target.value)} className="Search-input" type="text" placeholder="Search for pokemon" />
@@ -60,7 +89,36 @@ function Search() {
         Search
       </button>
 
-      {isSearchOn && <div className="card-holder"></div>}
+      {isSearchOn && (
+        <div className="card-holder">
+          {list.map(item => {
+            return (
+              <div key={item.id} className="card">
+                <h3 className="card--title">{item.name}</h3>
+                {!setIsSearchOn ? (
+                  <h1>loading</h1>
+                ) : (
+                  <div>
+                    <img className="card-image" onClick={turnImage} src={turn ? item.spriteBack : item.spriteFront} alt="" />{" "}
+                  </div>
+                )}
+
+                <dl className="card-skill--list">
+                  <dt className="card-skill--title">Skills</dt>
+                  {item.abilities.map(skill => {
+                    i++;
+                    return (
+                      <dd key={i} className="card-skill--synopsis first-skill">
+                        {skill}
+                      </dd>
+                    );
+                  })}
+                </dl>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

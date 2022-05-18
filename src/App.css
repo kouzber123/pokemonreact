@@ -1,3 +1,9 @@
+body {
+  font-family: "Courier New", Courier, monospace;
+  background-color: #006366;
+  background-image: url("https://www.transparenttextures.com/patterns/45-degree-fabric-light.png");
+  /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+}
 .App-header--pages {
   margin: 0 auto;
   text-align: center;
@@ -38,12 +44,13 @@ footer-body--content {
 }
 
 .card {
-  border: solid 10px rgba(255, 0, 0, 0.637);
-  background-color: rgba(14, 14, 223, 0.655);
-  width: 15%;
+  border: solid 10px rgba(30, 0, 255, 0.694);
+  background-color: rgba(195, 223, 14, 0.655);
+  width: 25%;
   margin: 0 auto;
   margin-top: 3rem;
   padding-bottom: 4rem;
+  text-align: center;
 }
 .card--title {
   text-decoration: underline;
@@ -52,8 +59,12 @@ footer-body--content {
 .card--title::first-letter {
   text-transform: uppercase;
 }
-.card--img {
+.card-image {
   margin: 0 auto;
+  width: 10rem;
+  box-shadow: 2px 2px 1px;
+  border: 1px black solid;
+  padding: 1rem;
 }
 .card-skill {
   color: black;
@@ -61,6 +72,22 @@ footer-body--content {
 .card-skill--list {
   text-decoration: none;
 }
+
+.card-skill--title {
+  font-weight: bold;
+  border-bottom: 3px solid rgba(0, 0, 0, 0.818);
+  margin-bottom: 1rem;
+}
+.card-skill--synopsis {
+  text-align: left;
+  margin-right: 2rem;
+  padding-top: 2px;
+}
+
+.card-skill--synopsis::first-letter {
+  text-transform: uppercase;
+}
+
 .card-skill--name {
   list-style-type: none;
   text-decoration: none;
