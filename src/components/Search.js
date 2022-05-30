@@ -19,7 +19,6 @@ function Search() {
       await axios.get(url).then(response => {
         if (response) {
           const data = response.data;
-          console.log(data);
           //forward data
           getSkillSynopsis(data, data.abilities);
         }
