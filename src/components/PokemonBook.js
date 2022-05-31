@@ -1,51 +1,87 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Card from "./Card";
 function PokemonBook() {
   var flavor_skill_text = [];
   var skill_namess = [];
-  const [search, setSearch] = useState("");
-  const [isSearchDone, setIsSearchDone] = useState(false);
-  const [list, setList] = useState([{}]);
-  const [index, setIndex] = useState([]);
+  const [isSearchDone, setIsSearchDone] = useState(Boolean);
+  const [list, setList] = useState([]);
 
   useEffect(() => {
-    async function handleApiCall() {
-      const url = `https://pokeapi.co/api/v2/pokemon-form/?limit=20&offset=20`;
+    const url = `https://pokeapi.co/api/v2/pokemon/?limit=20&offset=20`;
+    const fetchData = async () => {
       try {
-        await axios.get(url).then(response => {
-          if (response) {
-            const data = response.data;
-            //forward data
-            console.log(data.results);
-            //to get results we have to index thro
-            console.log(data.results[0].name);
-            var l = [];
-            l.push(data.results);
-            if (data) {
-              console.log(l);
-              var i = 0;
+        const response = await fetch(url);
+        const json = await response.json();
 
-              console.log(l[0][3]);
-            }
-          }
-        });
+        setList([json.results]);
+        setIsSearchDone(true);
       } catch (error) {
-        console.log("something happened");
+        console.log(error);
       }
-    }
-
-    handleApiCall();
-    setIsSearchDone(true);
+    };
+    fetchData();
   }, []);
+  console.log(list);
 
   useEffect(() => {
-    console.log(list);
-    console.log(index);
-  });
+    //1) get pokemon details
+    const getDetails = async () => {
+      try {
+        axios.all(
+          list[0].map(async url => {
+            var u = url.url;
+            return axios.get(u).then(response => {
+              if (response) {
+                const data = response.data;
+                // console.log(data);
+                getSkillMeaning(data.abilities);
+              }
+            });
+          })
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    //get pokemon skill details
+    const getSkillMeaning = async data => {
+      //get ability names to combine
+      // console.log(data);
+      var skill_names = data.map(item => {
+        skill_namess.push(item.ability.name);
+        return item.ability.name;
+      });
+
+      // console.log(skill_names);
+      try {
+        axios.all(
+          data.map(async url => {
+            var skillUrl = url.ability.url;
+            return axios.get(skillUrl).then(response => {
+              if (response) {
+                var res = response.data.flavor_text_entries[1].flavor_text;
+                flavor_skill_text.push(res);
+              }
+              var j = -1;
+              var combine_Skill_synopsis = skill_namess.map(skill => {
+                j++;
+                return skill + " " + flavor_skill_text[j];
+              });
+              console.log(combine_Skill_synopsis);
+            });
+          })
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getDetails();
+  }, [list, skill_namess, flavor_skill_text]);
+
   return (
-    <div className="Search">
-      <h1>Here pokemons</h1>
+    <div>
+      <h1>hello</h1>
     </div>
   );
 }
